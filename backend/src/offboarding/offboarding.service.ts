@@ -82,6 +82,10 @@ export class OffboardingService {
         title: 'Finance View',
         approvalField: 'financeClearance',
       },
+      it: {
+        title: 'IT Overview',
+        approvalField: 'itClearance',
+      },
       manager: {
         title: 'Manager View',
         approvalField: 'managerApproval',

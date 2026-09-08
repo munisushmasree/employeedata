@@ -22,6 +22,14 @@ const roleConfig = {
     label: "Finance Clearance",
     accent: "emerald",
   },
+  it: {
+    title: "IT Overview",
+    description: "Complete systems, equipment, and access clearance.",
+    field: "itClearance",
+    stageKey: "admin-systems",
+    label: "IT Clearance",
+    accent: "cyan",
+  },
   manager: {
     title: "Manager View",
     description: "Approve exits for employees in your organization.",

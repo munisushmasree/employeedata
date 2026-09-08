@@ -20,7 +20,14 @@ export default function LoginPage() {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userRole", role);
 
-      router.push(role === "hr" ? "/hr-overview" : `/${role}`);
+      const roleRoutes = {
+        hr: "/hr-overview",
+        it: "/it-overview",
+        finance: "/finance",
+        manager: "/manager",
+      };
+
+      router.push(roleRoutes[role]);
     } else {
       alert("Please enter email and password");
     }
@@ -73,6 +80,7 @@ export default function LoginPage() {
             <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full rounded-md border px-3 py-2">
               <option value="hr">HR</option>
               <option value="finance">Finance</option>
+              <option value="it">IT / Admin & Systems</option>
               <option value="manager">Manager</option>
             </select>
           </div>

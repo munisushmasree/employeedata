@@ -135,7 +135,7 @@ export default function DashboardPage() {
         View Offboardings
       </button>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-4">
         <button onClick={() => router.push("/hr-overview")} className="rounded-lg bg-white p-5 text-left shadow hover:ring-2 hover:ring-blue-300">
           <p className="font-semibold text-gray-900">HR Overview</p>
           <p className="mt-1 text-sm text-gray-500">Review HR clearance requests</p>
@@ -143,6 +143,10 @@ export default function DashboardPage() {
         <button onClick={() => router.push("/finance")} className="rounded-lg bg-white p-5 text-left shadow hover:ring-2 hover:ring-emerald-300">
           <p className="font-semibold text-gray-900">Finance View</p>
           <p className="mt-1 text-sm text-gray-500">Complete finance clearance</p>
+        </button>
+        <button onClick={() => router.push("/it-overview")} className="rounded-lg bg-white p-5 text-left shadow hover:ring-2 hover:ring-cyan-300">
+          <p className="font-semibold text-gray-900">IT Overview</p>
+          <p className="mt-1 text-sm text-gray-500">Clear systems and equipment</p>
         </button>
         <button onClick={() => router.push("/manager")} className="rounded-lg bg-white p-5 text-left shadow hover:ring-2 hover:ring-violet-300">
           <p className="font-semibold text-gray-900">Manager View</p>
