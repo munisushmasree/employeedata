@@ -3,6 +3,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { OffboardingController } from './offboarding.controller';
 import { OffboardingService } from './offboarding.service';
+import { AuditModule } from '../audit/audit.module';
+import { WorkflowService } from '../workflow/workflow.service';
+import {
+  WorkflowConfig,
+  WorkflowConfigSchema,
+} from '../workflow/workflow.schema';
 
 import {
   Offboarding,
@@ -11,16 +17,21 @@ import {
 
 @Module({
   imports: [
+    AuditModule,
     MongooseModule.forFeature([
       {
         name: Offboarding.name,
         schema: OffboardingSchema,
       },
+      {
+        name: WorkflowConfig.name,
+        schema: WorkflowConfigSchema,
+      },
     ]),
   ],
 
   controllers: [OffboardingController],
-  providers: [OffboardingService],
+  providers: [OffboardingService, WorkflowService],
 
   exports: [OffboardingService],
 })

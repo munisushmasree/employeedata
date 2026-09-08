@@ -20,6 +20,12 @@ export class Audit {
   userId: string;
 
   @Prop()
+  userName: string;
+
+  @Prop()
+  role: string;
+
+  @Prop()
   field: string;
 
   @Prop()
@@ -27,6 +33,9 @@ export class Audit {
 
   @Prop()
   to: string;
+
+  @Prop()
+  remarks: string;
 }
 
 export const AuditSchema =

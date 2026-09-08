@@ -8,11 +8,16 @@ export default function OffboardingDetailsPage() {
   const router = useRouter();
 
   const [employee, setEmployee] = useState(null);
+  const [auditHistory, setAuditHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (params.id) {
       fetchOffboarding();
+      fetch(`http://localhost:5000/api/offboarding/${params.id}/audit`)
+        .then((response) => (response.ok ? response.json() : []))
+        .then(setAuditHistory)
+        .catch(() => setAuditHistory([]));
     }
   }, [params.id]);
 
@@ -175,8 +180,21 @@ export default function OffboardingDetailsPage() {
 
         <div className="space-y-4">
 
+          {employee.approvalStages?.length > 0 && employee.approvalStages.map((stage) => (
+            <div key={stage.key} className="border p-4 rounded">
+              <div className="flex justify-between gap-4">
+                <span className="font-medium">{stage.name}</span>
+                <span className={stage.status === "Approved" ? "text-green-600 font-semibold" : stage.status === "Active" ? "text-blue-600 font-semibold" : "text-yellow-600"}>
+                  {stage.status}
+                </span>
+              </div>
+              <p className="mt-2 text-sm text-gray-500">Role: {stage.role} | Mode: {stage.mode}</p>
+              {stage.remarks && <p className="mt-2 text-sm text-gray-700">Remark: {stage.remarks}</p>}
+            </div>
+          ))}
+
           {/* HR */}
-          <div className="flex justify-between border p-4 rounded">
+          {!employee.approvalStages?.length && <div className="flex justify-between border p-4 rounded">
             <span>
               HR Clearance
             </span>
@@ -190,10 +208,10 @@ export default function OffboardingDetailsPage() {
             >
               {employee.hrClearance}
             </span>
-          </div>
+          </div>}
 
           {/* IT */}
-          <div className="flex justify-between border p-4 rounded">
+          {!employee.approvalStages?.length && <div className="flex justify-between border p-4 rounded">
             <span>
               IT Clearance
             </span>
@@ -207,10 +225,10 @@ export default function OffboardingDetailsPage() {
             >
               {employee.itClearance}
             </span>
-          </div>
+          </div>}
 
           {/* Finance */}
-          <div className="flex justify-between border p-4 rounded">
+          {!employee.approvalStages?.length && <div className="flex justify-between border p-4 rounded">
             <span>
               Finance Clearance
             </span>
@@ -224,10 +242,10 @@ export default function OffboardingDetailsPage() {
             >
               {employee.financeClearance}
             </span>
-          </div>
+          </div>}
 
           {/* Manager */}
-          <div className="flex justify-between border p-4 rounded">
+          {!employee.approvalStages?.length && <div className="flex justify-between border p-4 rounded">
             <span>
               Manager Approval
             </span>
@@ -241,8 +259,20 @@ export default function OffboardingDetailsPage() {
             >
               {employee.managerApproval}
             </span>
-          </div>
+          </div>}
 
+        </div>
+
+        <hr className="my-8" />
+        <h2 className="text-xl font-bold mb-4">Activity History</h2>
+        <div className="space-y-3">
+          {auditHistory.length === 0 ? <p className="text-sm text-gray-500">No activity recorded yet.</p> : auditHistory.map((item) => (
+            <div key={item._id} className="border-l-2 border-blue-500 pl-3 text-sm">
+              <p className="font-medium">{item.action} by {item.userName || item.userId || "System"}</p>
+              <p className="text-gray-500">{item.role || "System"} | {new Date(item.createdAt).toLocaleString()}</p>
+              {item.remarks && <p className="text-gray-700">{item.remarks}</p>}
+            </div>
+          ))}
         </div>
 
       </div>

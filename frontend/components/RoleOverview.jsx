@@ -10,6 +10,7 @@ const roleConfig = {
     title: "HR Overview",
     description: "Review employee exits and complete HR clearance.",
     field: "hrClearance",
+    stageKey: "hr",
     label: "HR Clearance",
     accent: "blue",
   },
@@ -17,6 +18,7 @@ const roleConfig = {
     title: "Finance View",
     description: "Track financial clearance for every employee exit.",
     field: "financeClearance",
+    stageKey: "accounts",
     label: "Finance Clearance",
     accent: "emerald",
   },
@@ -24,6 +26,7 @@ const roleConfig = {
     title: "Manager View",
     description: "Approve exits for employees in your organization.",
     field: "managerApproval",
+    stageKey: "manager",
     label: "Manager Approval",
     accent: "violet",
   },
@@ -47,6 +50,7 @@ export default function RoleOverview({ role }) {
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [remarks, setRemarks] = useState({});
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -57,11 +61,12 @@ export default function RoleOverview({ role }) {
 
     const fetchRecords = async () => {
       try {
-        const response = await fetch(`${API_URL}/offboarding`, {
+        const response = await fetch(`${API_URL}/offboarding/view/${role}`, {
           cache: "no-store",
         });
         if (!response.ok) throw new Error("Unable to load offboarding records");
-        setRecords(await response.json());
+        const data = await response.json();
+        setRecords(data.records || []);
         setLastUpdated(new Date());
         setError("");
       } catch (loadError) {
@@ -77,7 +82,10 @@ export default function RoleOverview({ role }) {
     return () => clearInterval(refreshTimer);
   }, [router, refreshKey]);
 
-  const pending = records.filter((record) => record[config.field] !== "Approved");
+  const pending = records.filter((record) => {
+    const stage = record.approvalStages?.find((item) => item.key === config.stageKey);
+    return (stage?.status || record[config.field]) !== "Approved";
+  });
   const approved = records.length - pending.length;
 
   const updateApproval = async (recordId, value) => {
@@ -87,7 +95,13 @@ export default function RoleOverview({ role }) {
       const response = await fetch(`${API_URL}/offboarding/${recordId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [config.field]: value }),
+        body: JSON.stringify({
+          stageKey: config.stageKey,
+          status: value,
+          role: config.title,
+          userName: localStorage.getItem("userName") || "HR Admin",
+          remarks: remarks[recordId] || "",
+        }),
       });
       if (!response.ok) throw new Error("Unable to update approval");
       const updated = await response.json();
@@ -161,7 +175,8 @@ export default function RoleOverview({ role }) {
                 ) : records.length === 0 ? (
                   <tr><td colSpan="5" className="p-8 text-center text-gray-500">No offboarding requests found.</td></tr>
                 ) : records.map((record) => {
-                  const status = record[config.field] || "Pending";
+                  const stage = record.approvalStages?.find((item) => item.key === config.stageKey);
+                  const status = stage?.status || record[config.field] || "Pending";
                   const isUpdating = updatingId === record._id;
                   return (
                     <tr key={record._id} className="border-t border-gray-100">
@@ -173,6 +188,12 @@ export default function RoleOverview({ role }) {
                       </td>
                       <td className="p-4">
                         <div className="flex gap-2">
+                          <input
+                            value={remarks[record._id] || ""}
+                            onChange={(event) => setRemarks((current) => ({ ...current, [record._id]: event.target.value }))}
+                            placeholder="Remark"
+                            className="w-28 rounded-md border border-gray-300 px-2 py-1.5"
+                          />
                           <button disabled={isUpdating || status === "Approved"} onClick={() => updateApproval(record._id, "Approved")} className="rounded-md bg-green-600 px-3 py-1.5 text-white disabled:cursor-not-allowed disabled:opacity-40">
                             Approve
                           </button>

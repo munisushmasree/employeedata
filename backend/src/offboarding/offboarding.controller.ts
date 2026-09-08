@@ -27,10 +27,25 @@ export class OffboardingController {
     return this.offboardingService.findAll();
   }
 
+  @Get('workflow/config')
+  async workflowConfig() {
+    return this.offboardingService.getWorkflowConfig();
+  }
+
+  @Patch('workflow/config')
+  async updateWorkflowConfig(@Body('stages') stages: any[]) {
+    return this.offboardingService.updateWorkflowConfig(stages);
+  }
+
   // Get the dynamic view for HR, Finance, or Manager
   @Get('view/:role')
   async findRoleView(@Param('role') role: string) {
     return this.offboardingService.findRoleView(role);
+  }
+
+  @Get(':id/audit')
+  async audit(@Param('id') id: string) {
+    return this.offboardingService.findAuditHistory(id);
   }
 
   // Get one offboarding record

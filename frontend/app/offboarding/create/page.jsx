@@ -12,7 +12,10 @@ export default function CreateOffboardingPage() {
     department: "",
     reason: "",
     lastWorkingDay: "",
+    resignationDate: "",
   });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -21,14 +24,28 @@ export default function CreateOffboardingPage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Offboarding Data:", formData);
-
-    alert("Offboarding created successfully");
-
-    router.push("/offboarding");
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch("http://localhost:5000/api/offboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          createdByName: localStorage.getItem("userName") || "HR Admin",
+          createdById: localStorage.getItem("userId") || "system",
+        }),
+      });
+      if (!response.ok) throw new Error("Unable to create offboarding workflow");
+      router.push("/offboarding");
+    } catch (submitError) {
+      setError(submitError.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -45,6 +62,8 @@ export default function CreateOffboardingPage() {
 
       {/* Form Container */}
       <div className="bg-white p-8 rounded-lg shadow max-w-2xl">
+
+        {error && <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
         <form onSubmit={handleSubmit}>
 
@@ -177,6 +196,18 @@ export default function CreateOffboardingPage() {
             />
 
           </div>
+          {/* Resignation Date */}
+          <div className="mb-4">
+            <label className="block mb-2 font-medium">Resignation Date</label>
+            <input
+              type="date"
+              name="resignationDate"
+              value={formData.resignationDate}
+              onChange={handleChange}
+              className="w-full border rounded-md px-3 py-2"
+              required
+            />
+          </div>
 
           {/* Buttons */}
           <div className="flex gap-4">
@@ -185,7 +216,7 @@ export default function CreateOffboardingPage() {
               type="submit"
               className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700"
             >
-              Create Offboarding
+              {saving ? "Creating workflow..." : "Create Offboarding"}
             </button>
 
             <button

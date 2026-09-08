@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { WorkflowStage } from '../workflow/workflow.service';
 
 export type OffboardingDocument =
   HydratedDocument<Offboarding>;
@@ -19,6 +20,9 @@ export class Offboarding {
   reason: string;
 
   @Prop({ required: true })
+  resignationDate: string;
+
+  @Prop({ required: true })
   lastWorkingDay: string;
 
   @Prop({ default: 'Pending' })
@@ -35,6 +39,9 @@ export class Offboarding {
 
   @Prop({ default: 'Pending' })
   managerApproval: string;
+
+  @Prop({ type: [Object], default: [] })
+  approvalStages: WorkflowStage[];
 }
 
 export const OffboardingSchema =
